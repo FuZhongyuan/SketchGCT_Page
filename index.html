@@ -180,8 +180,7 @@
 			text: "The hunter was alerted by the sound of rustling vegetation behind her.",
 			prompt: "common_voice_en_79862.wav",
 			naturalSpeech2: "The_hunter_was_alerted_by_the_sound_of_rustling_vegetation_behind_her..wav",
-			styletts2: "common_voice_en_79862-common_voice_en_79860.wav",
-			sketchgct2: true
+			styletts2: "common_voice_en_79862-common_voice_en_79860.wav"
 		},
 		{
 			id: "en3",
@@ -242,8 +241,7 @@
 		{
 			id: "zh1",
 			text: "妈妈从我手中拿走我歌曲的歌看，边看边赞不绝口。",
-			prompt: "00004510-00000116.wav",
-			sketchgct2: true
+			prompt: "00004510-00000116.wav"
 		},
 		{
 			id: "zh2",
@@ -440,9 +438,6 @@
 			{ label: "sketchgct(only energy)", src: `${base}/sketchgct_only_energy/output.wav` }
 		);
 
-		if (sample.sketchgct2) {
-			items.push({ label: "sketchgct2", src: `${base}/sketchgct2/output.wav` });
-		}
 		return items;
 	};
 
