@@ -40,6 +40,18 @@
 			text-align: center;
 		}
 
+		.score-control {
+			display: inline-grid;
+			gap: 4px;
+			justify-items: center;
+		}
+
+		.score-label {
+			font-size: 0.82em;
+			font-weight: 700;
+			color: #263c4c;
+		}
+
 		.sketch-pair {
 			display: grid;
 			grid-template-columns: minmax(260px, 1fr);
@@ -368,7 +380,11 @@
 			const selected = score === value ? " selected" : "";
 			return `<option value="${score}"${selected}>${label}</option>`;
 		}).join("");
-		return `<select class="score-select" data-key="${escapeAttr(key)}" data-metric="${escapeAttr(metric)}">${options}</select>`;
+		return `
+			<div class="score-control">
+				<span class="score-label">${escapeHtml(metric)}</span>
+				<select class="score-select" data-key="${escapeAttr(key)}" data-metric="${escapeAttr(metric)}">${options}</select>
+			</div>`;
 	};
 
 	const audioControl = (src) => `
