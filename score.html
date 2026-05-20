@@ -112,6 +112,7 @@
 			</thead>
 			<tbody>
 			<tr><td>MOS</td><td class="rating-text">Mean Opinion Score: overall speech naturalness and audio quality.</td></tr>
+			<tr><td>SS</td><td class="rating-text">Speaker Similarity: how similar the generated speaker identity is to the prompt audio.</td></tr>
 			<tr><td>FSC</td><td class="rating-text">F0 Sketch Correlation: how well the generated pitch contour follows the given F0 sketch.</td></tr>
 			<tr><td>ESC</td><td class="rating-text">Energy Sketch Correlation: how well the generated energy contour follows the given energy sketch.</td></tr>
 			</tbody>
@@ -140,16 +141,18 @@
 
 <div class="container pt-5 mt-5 shadow-lg p-5 mb-5 bg-white rounded">
 	<h2 style="text-align: center;">Speech Synthesis Conditioned on Sketches</h2>
-	<p class="note">Rate MOS, F0 sketch correlation (FSC), and energy sketch correlation (ESC).</p>
+	<p class="note">Rate MOS, speaker similarity (SS), F0 sketch correlation (FSC), and energy sketch correlation (ESC).</p>
 	<div class="table-responsive pt-3">
 		<table class="table table-hover pt-2 rating-table">
 			<thead>
 			<tr>
 			<th>Text</th>
 			<th>Sketches</th>
+			<th>Prompt Audio</th>
 			<th>System</th>
 			<th>Audio</th>
 			<th>MOS</th>
+			<th>SS</th>
 			<th>FSC</th>
 			<th>ESC</th>
 			</tr>
@@ -161,16 +164,18 @@
 
 <div class="container pt-5 mt-5 shadow-lg p-5 mb-5 bg-white rounded">
 	<h2 style="text-align: center;">Speech Synthesis with and without Sketches</h2>
-	<p class="note">Rate MOS for generated speech with sketches and without sketches.</p>
+	<p class="note">Rate MOS and speaker similarity (SS) for generated speech with sketches and without sketches.</p>
 	<div class="table-responsive pt-3">
 		<table class="table table-hover pt-2 rating-table">
 			<thead>
 			<tr>
 			<th>Text</th>
 			<th>Prompt Text</th>
+			<th>Prompt Audio</th>
 			<th>Condition</th>
 			<th>Audio</th>
 			<th>MOS</th>
+			<th>SS</th>
 			</tr>
 			</thead>
 			<tbody id="with-without-rating-body"></tbody>
@@ -269,6 +274,29 @@
 		{ id: "zh10", lang: "zh", text: "一端是该名词的正向描述，另一端是负面描述。" }
 	];
 
+	const paragraph1PromptAudio = {
+		en1: "sketch/Paragraph_1/en1/prompt_speech/common_voice_en_20617.wav",
+		en2: "sketch/Paragraph_1/en2/prompt_speech/common_voice_en_79862.wav",
+		en3: "sketch/Paragraph_1/en3/prompt_speech/common_voice_en_86172.wav",
+		en4: "sketch/Paragraph_1/en4/prompt_speech/common_voice_en_489724.wav",
+		en5: "sketch/Paragraph_1/en5/prompt_speech/common_voice_en_603760.wav",
+		en6: "sketch/Paragraph_1/en6/prompt_speech/common_voice_en_605765.wav",
+		en7: "sketch/Paragraph_1/en7/prompt_speech/common_voice_en_20030172.wav",
+		en8: "sketch/Paragraph_1/en8/prompt_speech/common_voice_en_648428.wav",
+		en9: "sketch/Paragraph_1/en9/prompt_speech/common_voice_en_664748.wav",
+		en10: "sketch/Paragraph_1/en10/prompt_speech/common_voice_en_17451108.wav",
+		zh1: "sketch/Paragraph_1/zh1/prompt_speech/00004510-00000116.wav",
+		zh2: "sketch/Paragraph_1/zh2/prompt_speech/00004531-00000037.wav",
+		zh3: "sketch/Paragraph_1/zh3/prompt_speech/00004512-00000031.wav",
+		zh4: "sketch/Paragraph_1/zh4/prompt_speech/00004587-00000070.wav",
+		zh5: "sketch/Paragraph_1/zh5/prompt_speech/00004580-00000072.wav",
+		zh6: "sketch/Paragraph_1/zh6/prompt_speech/00004585-00000091.wav",
+		zh7: "sketch/Paragraph_1/zh7/prompt_speech/00004595-00000095.wav",
+		zh8: "sketch/Paragraph_1/zh8/prompt_speech/00004599-00000020.wav",
+		zh9: "sketch/Paragraph_1/zh9/prompt_speech/00004600-00000067.wav",
+		zh10: "sketch/Paragraph_1/zh10/prompt_speech/00004604-00000110.wav"
+	};
+
 	const paragraph3Samples = [
 		{
 			id: "en1",
@@ -335,6 +363,17 @@
 			output: "10004392-00000077.wav"
 		}
 	];
+
+	const paragraph3PromptAudio = {
+		en1: "sketch/Paragraph_3/with_sketch/en/1/prompt_speech/common_voice_en_2331.wav",
+		en2: "sketch/Paragraph_3/with_sketch/en/2/prompt_speech/common_voice_en_13900.wav",
+		en3: "sketch/Paragraph_3/with_sketch/en/3/prompt_speech/common_voice_en_17161.wav",
+		en4: "sketch/Paragraph_3/with_sketch/en/4/prompt_speech/common_voice_en_20617.wav",
+		zh1: "sketch/Paragraph_3/with_sketch/zh/1/prompt_speech/00000309-00000300.wav",
+		zh2: "sketch/Paragraph_3/with_sketch/zh/2/prompt_speech/00004523-00000027.wav",
+		zh3: "sketch/Paragraph_3/with_sketch/zh/3/prompt_speech/00004524-00000028.wav",
+		zh4: "sketch/Paragraph_3/with_sketch/zh/4/prompt_speech/10004392-00000076.wav"
+	};
 
 	const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (char) => ({
 		"&": "&amp;",
@@ -437,6 +476,7 @@
 	const renderConditionedRatings = () => {
 		const rows = [];
 		paragraph1Samples.forEach((sample) => {
+			const promptAudioSrc = paragraph1PromptAudio[sample.id];
 			conditionedMethods(sample).forEach((method) => {
 				const key = rowKey("conditioned_on_sketches", sample.id, method.id);
 				ratingRows.push({
@@ -446,20 +486,23 @@
 					language: sample.lang,
 					text: sample.text,
 					promptText: "",
+					promptAudioSrc,
 					condition: "",
 					system: method.id,
 					audioSrc: method.src
 				});
 				rows.push(`
-					<tr>
-						<td class="rating-text">${escapeHtml(sample.text)}</td>
-						<td>${sketchPair(sample.id)}</td>
-						<td>${escapeHtml(method.label)}</td>
-						<td>${audioControl(method.src)}</td>
-						<td>${selectControl(key, "MOS")}</td>
-						<td>${selectControl(key, "FSC")}</td>
-						<td>${selectControl(key, "ESC")}</td>
-					</tr>`);
+						<tr>
+							<td class="rating-text">${escapeHtml(sample.text)}</td>
+							<td>${sketchPair(sample.id)}</td>
+							<td>${audioControl(promptAudioSrc)}</td>
+							<td>${escapeHtml(method.label)}</td>
+							<td>${audioControl(method.src)}</td>
+							<td>${selectControl(key, "MOS")}</td>
+							<td>${selectControl(key, "SS")}</td>
+							<td>${selectControl(key, "FSC")}</td>
+							<td>${selectControl(key, "ESC")}</td>
+						</tr>`);
 			});
 		});
 		document.getElementById("conditioned-rating-body").innerHTML = rows.join("");
@@ -468,6 +511,7 @@
 	const renderWithWithoutRatings = () => {
 		const rows = [];
 		paragraph3Samples.forEach((sample) => {
+			const promptAudioSrc = paragraph3PromptAudio[sample.id];
 			[
 				{
 					id: "with_sketch",
@@ -488,18 +532,21 @@
 					language: sample.lang,
 					text: sample.text,
 					promptText: sample.promptText,
+					promptAudioSrc,
 					condition: condition.id,
 					system: "",
 					audioSrc: condition.src
 				});
 				rows.push(`
-					<tr>
-						<td class="rating-text">${escapeHtml(sample.text)}</td>
-						<td class="rating-text">${escapeHtml(sample.promptText)}</td>
-						<td>${escapeHtml(condition.label)}</td>
-						<td>${audioControl(condition.src)}</td>
-						<td>${selectControl(key, "MOS")}</td>
-					</tr>`);
+						<tr>
+							<td class="rating-text">${escapeHtml(sample.text)}</td>
+							<td class="rating-text">${escapeHtml(sample.promptText)}</td>
+							<td>${audioControl(promptAudioSrc)}</td>
+							<td>${escapeHtml(condition.label)}</td>
+							<td>${audioControl(condition.src)}</td>
+							<td>${selectControl(key, "MOS")}</td>
+							<td>${selectControl(key, "SS")}</td>
+						</tr>`);
 			});
 		});
 		document.getElementById("with-without-rating-body").innerHTML = rows.join("");
@@ -514,10 +561,12 @@
 			"language",
 			"text",
 			"prompt_text",
+			"prompt_audio_src",
 			"system",
 			"condition",
 			"audio_src",
 			"MOS",
+			"SS",
 			"FSC",
 			"ESC",
 			"updated_at"
@@ -532,10 +581,12 @@
 				row.language,
 				row.text,
 				row.promptText,
+				row.promptAudioSrc,
 				row.system,
 				row.condition,
 				row.audioSrc,
 				scores.MOS || "",
+				scores.SS || "",
 				scores.FSC || "",
 				scores.ESC || "",
 				scores.updatedAt || ""
