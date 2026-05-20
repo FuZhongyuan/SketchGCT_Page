@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="generator" content="Hugo 0.88.1" />
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,700" rel="stylesheet" type="text/css">
+	<link rel="stylesheet" href=""https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/github.min.css">
+	<link rel="stylesheet" href="css/custom.css">
+	<link rel="stylesheet" href="css/normalize.css">
+
+	<title>SketchGCT</title>
+	<link href="css/bootstrap.min.css" rel="stylesheet">
+	<style>
+		.demo-table th,
+		.demo-table td {
+			vertical-align: middle;
+			text-align: center;
+		}
+
+		.demo-text {
+			min-width: 260px;
+			text-align: left;
+		}
+
+		.sketch-pair {
+			display: grid;
+			grid-template-columns: minmax(260px, 1fr);
+			gap: 12px;
+			min-width: 280px;
+		}
+
+		.sketch-item,
+		.audio-item {
+			text-align: center;
+		}
+
+		.sketch-label,
+		.audio-label {
+			display: block;
+			margin-bottom: 4px;
+			font-size: 0.82em;
+			font-weight: 700;
+			color: #263c4c;
+		}
+
+		.sketch-image {
+			max-width: 260px;
+			margin: 0;
+		}
+
+		.audio-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+			gap: 10px;
+			min-width: 420px;
+		}
+
+		.demo-audio {
+			width: 190px;
+		}
+	</style>
+
+</head>
+
+
+<body data-new-gr-c-s-check-loaded="14.1091.0" data-gr-ext-installed="">
+
+<div class="container" >
+<header role="banner">
+</header>
+<main role="main">
+<article itemscope itemtype="https://schema.org/BlogPosting">
+
+<div class="container pt-5 mt-5 shadow-lg p-5 mb-5 bg-white rounded">
+	<div class="text-center">
+	<h2>SketchGCT</h2>
+      <h3>Expressive Speech Synthesis Using Prosodic Sketches as Control Conditions</h3>
+      [<a href="comming soon">Code</a>] [<a href="">Paper</a>]
+
+        <p class="fst-italic mb-0">
+        	<br>
+            Zhongyuan Fu<sup>1</sup>
+      <p></p>
+        </p>
+        <p><b><sup>1</sup>College of Computer Science, Nankai University</b></p>
+	</div>
+	<p><b>Abstract.</b> Zero-shot text-to-speech can reproduce a target speaker's timbre from a short speech prompt, but fine-grained prosody control over phrasing, emphasis, speaking rate, and intonation remains difficult to specify and verify. This thesis formulates fine-grained controllable zero-shot TTS as a structured conditional generation problem and proposes SketchGCT (Sketch-Guided Codec Transformer). The model generates text-aware discrete speech tokens, uses the prompt speech to preserve speaker identity, represents target prosody with modular pitch and energy sketches, and injects these sketches into masked iterative refinement so that timing and prosodic details can be adjusted during generation. An evaluation protocol is built around content fidelity, speaker similarity, naturalness, and prosody-control consistency, covering reference-sketch transfer on Seed-TTS-Eval, manually drawn sketch control, and ablation studies. Experiments show that SketchGCT achieves the highest pitch and energy correlations on both English and Chinese test sets. In human evaluation, it also obtains stronger naturalness, speaker similarity, and control-consistency scores than the compared systems. Ablation results further show that joint pitch and energy sketches improve prosody fidelity while keeping speaker similarity stable. The proposed approach demonstrate that explicit prosody sketches provide an interpretable and editable local control path for zero-shot speech synthesis without substantially degrading speech quality or speaker identity.
+	</p>
+
+	<p>
+	<b>Contents</b>
+      <ul>
+        <li><a href="#model-overview">System Overview</a></li>
+        <li><a href="#tts-with-sketches-conditions">Speech Synthesis Conditioned on Sketches</a></li>
+		<li><a href="#tts-control">Speech Synthesis with Fine-grained Prosody Control</a></li>
+        <li><a href="#tts-text_only">Speech Synthesis with Text Only</a></li>
+      </ul>
+	</p>
+
+	
+</div>
+
+
+<div class="container pt-5 mt-5 shadow-lg p-5 mb-5 bg-white rounded">		
+	<h2 id="model-overview" style="text-align: center;">System Overview</h2>
+	<body>
+	<p style="text-align: center;">
+		<img src="pics/framework.png" height="400" width="800">
+	</p>
+	</body>
+		<p style="text-align: center;" >
+			<b>Figure 1.</b> Overview structure of the proposed SketchGCT. Paired speech and text data are used for training. User-supplied text and drawn pitch and energy sketch are used as inputs during inference.
+		</p>
+</div>
+
+
+<div class="container pt-5 mt-5 shadow-lg p-5 mb-5 bg-white rounded">
+	<h2 id="tts-with-sketches-conditions" style="text-align: center;">Speech Synthesis Conditioned on Sketches</h2>
+	<div class="table-responsive pt-3">
+		<table class="table table-hover pt-2 demo-table">
+			<thead>
+			<tr>
+			<th>Text</th>
+			<th>Sketches</th>
+			<th>Audio Samples</th>
+			</tr>
+			</thead>
+			<tbody id="paragraph-1-samples"></tbody>
+		</table>
+	</div>
+</div>
+
+
+<div class="container pt-5 mt-5 shadow-lg p-5 mb-5 bg-white rounded">
+	<h2 id="tts-control" style="text-align: center;">Speech Synthesis with Fine-grained Prosody Control</h2>
+	<div class="table-responsive pt-3">
+		<table class="table table-hover pt-2 demo-table">
+			<thead>
+			<tr>
+			<th>Target</th>
+			<th>Sketches</th>
+			<th>Audio Samples</th>
+			</tr>
+			</thead>
+			<tbody id="paragraph-2-samples"></tbody>
+		</table>
+	</div>
+</div>
+
+
+<div class="container pt-5 mt-5 shadow-lg p-5 mb-5 bg-white rounded">
+	<h2 id="tts-text_only" style="text-align: center;">Speech Synthesis with Text Only</h2>
+	<div class="table-responsive pt-3">
+		<table class="table table-hover pt-2 demo-table">
+			<thead>
+			<tr>
+			<th>Text</th>
+			<th>Prompt Text</th>
+			<th>Audio Samples</th>
+			</tr>
+			</thead>
+			<tbody id="paragraph-3-samples"></tbody>
+		</table>
+	</div>
+</div>
+
+<script>
+	const paragraph1Samples = [
+		{
+			id: "en1",
+			text: "But as he saw them lying there on the ground, another phrase came to his mind.",
+			prompt: "common_voice_en_20617.wav",
+			naturalSpeech2: "But_as_he_saw_them_lying_there_on_the_ground,_another_phrase_came_to_his_mind..wav",
+			styletts2: "common_voice_en_20617-common_voice_en_20618.wav"
+		},
+		{
+			id: "en2",
+			text: "The hunter was alerted by the sound of rustling vegetation behind her.",
+			prompt: "common_voice_en_79862.wav",
+			naturalSpeech2: "The_hunter_was_alerted_by_the_sound_of_rustling_vegetation_behind_her..wav",
+			styletts2: "common_voice_en_79862-common_voice_en_79860.wav",
+			sketchgct2: true
+		},
+		{
+			id: "en3",
+			text: "There is no universal definition of intelligence, but everyone agrees that the ability of learning belongs to it.",
+			prompt: "common_voice_en_86172.wav",
+			naturalSpeech2: "There_is_no_universal_definition_of_intelligence,_but_everyone_agrees_that_the_ability_of_learning_belongs_to_it..wav",
+			styletts2: "common_voice_en_86172-common_voice_en_86171.wav"
+		},
+		{
+			id: "en4",
+			text: "Nobody ever received the Nobel prize for the invention of chewing tobacco.",
+			prompt: "common_voice_en_489724.wav",
+			naturalSpeech2: "Nobody_ever_received_the_Nobel_prize_for_the_invention_of_chewing_tobacco..wav",
+			styletts2: "common_voice_en_489724-common_voice_en_489726.wav"
+		},
+		{
+			id: "en5",
+			text: "He remembered something his grandfather had once told him: that butterflies were a good omen.",
+			prompt: "common_voice_en_603760.wav",
+			naturalSpeech2: "He_remembered_something_his_grandfather_had_once_told_him:_that_butterflies_were_a_good_omen..wav",
+			styletts2: "common_voice_en_603760-common_voice_en_603759.wav"
+		},
+		{
+			id: "en6",
+			text: "Still a better love story than Twilight, he commented on the porn movie.",
+			prompt: "common_voice_en_605765.wav",
+			naturalSpeech2: "Still_a_better_love_story_than_Twilight,_he_commented_on_the_porn_movie..wav",
+			styletts2: "common_voice_en_605765-common_voice_en_605777.wav"
+		},
+		{
+			id: "en7",
+			text: "Various ecclesiastical areas, too small for a diocese, are termed prefects.",
+			prompt: "common_voice_en_20030172.wav",
+			naturalSpeech2: "Various_ecclesiastical_areas,_too_small_for_a_diocese,_are_termed_prefects..wav",
+			styletts2: "common_voice_en_20030172-common_voice_en_20030174.wav"
+		},
+		{
+			id: "en8",
+			text: "And he hadn't perceived them because he had become accustomed to them.",
+			prompt: "common_voice_en_648428.wav",
+			naturalSpeech2: "And_he_hadn't_perceived_them_because_he_had_become_accustomed_to_them..wav",
+			styletts2: "common_voice_en_648428-common_voice_en_648427.wav"
+		},
+		{
+			id: "en9",
+			text: "Lots of places sell tea around here, the merchant said.",
+			prompt: "common_voice_en_664748.wav",
+			naturalSpeech2: "Lots_of_places_sell_tea_around_here,_the_merchant_said..wav",
+			styletts2: "common_voice_en_664748-common_voice_en_664751.wav"
+		},
+		{
+			id: "en10",
+			text: "He always stutters when he's nervous, that's why he delegated the speech.",
+			prompt: "common_voice_en_17451108.wav",
+			naturalSpeech2: "He_always_stutters_when_he's_nervous,_that's_why_he_delegated_the_speech..wav",
+			styletts2: "common_voice_en_17451108-common_voice_en_17451109.wav"
+		},
+		{
+			id: "zh1",
+			text: "妈妈从我手中拿走我歌曲的歌看，边看边赞不绝口。",
+			prompt: "00004510-00000116.wav",
+			sketchgct2: true
+		},
+		{
+			id: "zh2",
+			text: "也只有到过村口的小动物，才知道村口有一家大熊拉面馆。",
+			prompt: "00004531-00000037.wav"
+		},
+		{
+			id: "zh3",
+			text: "一个人生活太顺畅，就会开始变懒，会想着法子玩新花样。",
+			prompt: "00004512-00000031.wav"
+		},
+		{
+			id: "zh4",
+			text: "希望自己也可以用盐雕，设计出自己钟爱的玩偶造型。",
+			prompt: "00004587-00000070.wav"
+		},
+		{
+			id: "zh5",
+			text: "哪有姑娘家自己说去做少奶奶，这种不知羞的话。",
+			prompt: "00004580-00000072.wav"
+		},
+		{
+			id: "zh6",
+			text: "酒吧黑漆漆，无日无夜，阿生说，你们打开门扫地。",
+			prompt: "00004585-00000091.wav"
+		},
+		{
+			id: "zh7",
+			text: "可以泳装的裙子飘舞在水中，做一条自由的一尾鱼。",
+			prompt: "00004595-00000095.wav"
+		},
+		{
+			id: "zh8",
+			text: "一阵短暂的间隙过后，又是一道触目惊心的闪光。",
+			prompt: "00004599-00000020.wav"
+		},
+		{
+			id: "zh9",
+			text: "今天晚上猪先生全家共进晚餐，马小姐恰好从窗外经过。",
+			prompt: "00004600-00000067.wav"
+		},
+		{
+			id: "zh10",
+			text: "一端是该名词的正向描述，另一端是负面描述。",
+			prompt: "00004604-00000110.wav"
+		}
+	];
+
+	const paragraph2Samples = [
+		"emphasize_how",
+		"emphasize_about",
+		"emphasize_camping",
+		"emphasize_this",
+		"emphasize_weekend",
+		"emphasize_going_weekend"
+	].map((id) => ({
+		id,
+		text: "How about going camping this weekend?",
+		prompt: "common_voice_en_175348.wav"
+	}));
+
+	const paragraph3Samples = [
+		{
+			id: "en1",
+			lang: "en",
+			number: "1",
+			text: "It isn't the money.",
+			promptText: "You've got the Mayor and Pullman backed against a wall.",
+			prompt: "common_voice_en_2331.wav",
+			output: "common_voice_en_2331-common_voice_en_2332.wav"
+		},
+		{
+			id: "en2",
+			lang: "en",
+			number: "2",
+			text: "We don't have the budget to produce it in studio quality.",
+			promptText: "Television can make you dumb, but it can also be good education.",
+			prompt: "common_voice_en_13900.wav",
+			output: "common_voice_en_13900-common_voice_en_13901.wav"
+		},
+		{
+			id: "en3",
+			lang: "en",
+			number: "3",
+			text: "He must be disguised to avoid encounters with thieves.",
+			promptText: "On the second day, the boy climbed to the top of a cliff near the camp.",
+			prompt: "common_voice_en_17161.wav",
+			output: "common_voice_en_17161-common_voice_en_17159.wav"
+		},
+		{
+			id: "en4",
+			lang: "en",
+			number: "4",
+			text: "But as he saw them lying there on the ground, another phrase came to his mind.",
+			promptText: "I think they perceived that nothing was to be done at the moment.",
+			prompt: "common_voice_en_20617.wav",
+			output: "common_voice_en_20617-common_voice_en_20618.wav"
+		},
+		{
+			id: "zh1",
+			lang: "zh",
+			number: "1",
+			text: "通过创新技术让未来出行更加安全，高效。",
+			promptText: "小偷却一点也不气馁，继续在抽屉里翻找。",
+			prompt: "00000309-00000300.wav",
+			output: "00000309-00000009.wav"
+		},
+		{
+			id: "zh2",
+			lang: "zh",
+			number: "2",
+			text: "同业公会最年长的成员，总要上台去讲一番，台子上挂着招牌。",
+			promptText: "还有人得了冻伤久治不愈，做这些事的人大有人在。",
+			prompt: "00004523-00000027.wav",
+			output: "00004523-00000030.wav"
+		},
+		{
+			id: "zh3",
+			lang: "zh",
+			number: "3",
+			text: "马云和蔡崇信，以及雷瑟斯帮助阿里巴巴，成功赴美上市。",
+			promptText: "即补硬短板也补软短板，既补发展短板也补制度短板。",
+			prompt: "00004524-00000028.wav",
+			output: "00004524-00000063.wav"
+		},
+		{
+			id: "zh4",
+			lang: "zh",
+			number: "4",
+			text: "烧猪肉，水煮马铃薯，油煎香菇，醋溜鱼片和火腿冬瓜汤。",
+			promptText: "柜面下安抽屉，抽屉下安柜门两扇。",
+			prompt: "10004392-00000076.wav",
+			output: "10004392-00000077.wav"
+		}
+	];
+
+	const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (char) => ({
+		"&": "&amp;",
+		"<": "&lt;",
+		">": "&gt;",
+		"\"": "&quot;",
+		"'": "&#39;"
+	}[char]));
+
+	const escapeAttr = (value) => String(value).replace(/[&<>"]/g, (char) => ({
+		"&": "&amp;",
+		"<": "&lt;",
+		">": "&gt;",
+		"\"": "&quot;"
+	}[char]));
+
+	const audioItem = ({ label, src }) => `
+		<div class="audio-item">
+			<span class="audio-label">${escapeHtml(label)}</span>
+			<audio controls="controls" class="demo-audio">
+				<source src="${escapeAttr(src)}" type="audio/wav">
+				Your browser does not support the audio element.
+			</audio>
+		</div>`;
+
+	const audioGrid = (items) => `<div class="audio-grid">${items.map(audioItem).join("")}</div>`;
+
+	const sketchPair = (base, id) => `
+		<div class="sketch-pair">
+			<div class="sketch-item">
+				<span class="sketch-label">f0</span>
+				<img class="sketch-image" src="${escapeAttr(`${base}/pictures/${id}_f0.png`)}" alt="${escapeHtml(id)} f0 sketch">
+			</div>
+			<div class="sketch-item">
+				<span class="sketch-label">energy</span>
+				<img class="sketch-image" src="${escapeAttr(`${base}/pictures/${id}_energy.png`)}" alt="${escapeHtml(id)} energy sketch">
+			</div>
+		</div>`;
+
+	const paragraph1Audios = (sample) => {
+		const base = `sketch/Paragraph_1/${sample.id}`;
+		const items = [
+			{ label: "prompt speech", src: `${base}/prompt_speech/${sample.prompt}` },
+			{ label: "cosyvoice1", src: `${base}/cosyvoice1/output.wav` },
+			{ label: "cosyvoice2", src: `${base}/cosyvoice2/output.wav` },
+			{ label: "cosyvoice3", src: `${base}/cosyvoice3/output.wav` }
+		];
+
+		if (sample.naturalSpeech2) {
+			items.push({ label: "NaturalSpeech2", src: `${base}/NaturalSpeech2/${sample.naturalSpeech2}` });
+		}
+		if (sample.styletts2) {
+			items.push({ label: "styletts2", src: `${base}/styletts2/${sample.styletts2}` });
+		}
+
+		items.push(
+			{ label: "sketchgct", src: `${base}/sketchgct/output.wav` },
+			{ label: "sketchgct(only f0)", src: `${base}/sketchgct_only_f0/output.wav` },
+			{ label: "sketchgct(only energy)", src: `${base}/sketchgct_only_energy/output.wav` }
+		);
+
+		if (sample.sketchgct2) {
+			items.push({ label: "sketchgct2", src: `${base}/sketchgct2/output.wav` });
+		}
+		return items;
+	};
+
+	const paragraph2Audios = (sample) => {
+		const base = `sketch/Paragraph_2/${sample.id}`;
+		return [
+			{ label: "prompt speech", src: `${base}/prompt_speech/${sample.prompt}` },
+			{ label: "sketchgct", src: `${base}/sketchgct/output.wav` }
+		];
+	};
+
+	const paragraph3Audios = (sample) => [
+		{
+			label: "prompt speech",
+			src: `sketch/Paragraph_3/with_sketch/${sample.lang}/${sample.number}/prompt_speech/${sample.prompt}`
+		},
+		{
+			label: "with sketch",
+			src: `sketch/Paragraph_3/with_sketch/${sample.lang}/${sample.number}/generate_speech/${sample.output}`
+		},
+		{
+			label: "without sketch",
+			src: `sketch/Paragraph_3/without_sketch/${sample.lang}/${sample.number}/generate_speech/${sample.output}`
+		}
+	];
+
+	const renderParagraph1 = () => {
+		document.getElementById("paragraph-1-samples").innerHTML = paragraph1Samples.map((sample) => `
+			<tr>
+				<td class="demo-text">${escapeHtml(sample.text)}</td>
+				<td>${sketchPair("sketch/Paragraph_1", sample.id)}</td>
+				<td>${audioGrid(paragraph1Audios(sample))}</td>
+			</tr>`).join("");
+	};
+
+	const renderParagraph2 = () => {
+		document.getElementById("paragraph-2-samples").innerHTML = paragraph2Samples.map((sample) => `
+			<tr>
+				<td class="demo-text">${escapeHtml(sample.id)}</td>
+				<td>${sketchPair("sketch/Paragraph_2", sample.id)}</td>
+				<td>${audioGrid(paragraph2Audios(sample))}</td>
+			</tr>`).join("");
+	};
+
+	const renderParagraph3 = () => {
+		document.getElementById("paragraph-3-samples").innerHTML = paragraph3Samples.map((sample) => `
+			<tr>
+				<td class="demo-text">${escapeHtml(sample.text)}</td>
+				<td class="demo-text">${escapeHtml(sample.promptText)}</td>
+				<td>${audioGrid(paragraph3Audios(sample))}</td>
+			</tr>`).join("");
+	};
+
+	document.addEventListener("DOMContentLoaded", () => {
+		renderParagraph1();
+		renderParagraph2();
+		renderParagraph3();
+	});
+</script>
+
+
+
+
+</article>
+</main>
+</div>
+
+</body>
+</html>

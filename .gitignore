@@ -1,0 +1,6 @@
+*.npy
+*.svg
+*.txt
+.DS_Store
+
+temp.py
