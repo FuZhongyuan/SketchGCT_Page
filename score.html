@@ -81,6 +81,20 @@
 			color: #263c4c;
 			font-weight: 700;
 		}
+
+		.speed-control {
+			display: inline-flex;
+			gap: 8px;
+			align-items: center;
+			font-weight: 700;
+			color: #263c4c;
+		}
+
+		.speed-select {
+			width: 92px;
+			height: 36px;
+			text-align: center;
+		}
 	</style>
 </head>
 
@@ -97,43 +111,72 @@
 
 	<p class="note">Scores are integers from 1 to 5. All changes are cached automatically in this browser.</p>
 	<div class="rating-actions">
+		<label class="speed-control" for="playback-rate">
+			Playback Speed
+			<select id="playback-rate" class="speed-select">
+				<option value="0.75">0.75x</option>
+				<option value="1">1.00x</option>
+				<option value="1.25">1.25x</option>
+				<option value="1.5">1.50x</option>
+				<option value="1.75">1.75x</option>
+				<option value="2">2.00x</option>
+			</select>
+		</label>
 		<button id="export-csv" class="btn btn-primary" type="button">Export CSV</button>
 		<span id="save-status" class="status-text">Cache ready.</span>
 	</div>
 
-	<h3 style="text-align: center;">Metric Definitions</h3>
+	<h3 style="text-align: center;">Detailed Rating Rubrics</h3>
 	<div class="table-responsive pt-3">
 		<table class="table table-hover pt-2 rating-table">
 			<thead>
 			<tr>
 			<th>Metric</th>
 			<th>Meaning</th>
+			<th>5</th>
+			<th>4</th>
+			<th>3</th>
+			<th>2</th>
+			<th>1</th>
 			</tr>
 			</thead>
 			<tbody>
-			<tr><td>MOS</td><td class="rating-text">Mean Opinion Score: overall speech naturalness and audio quality.</td></tr>
-			<tr><td>SS</td><td class="rating-text">Speaker Similarity: how similar the generated speaker identity is to the prompt audio.</td></tr>
-			<tr><td>FSC</td><td class="rating-text">F0 Sketch Correlation: how well the generated pitch contour follows the given F0 sketch.</td></tr>
-			<tr><td>ESC</td><td class="rating-text">Energy Sketch Correlation: how well the generated energy contour follows the given energy sketch.</td></tr>
-			</tbody>
-		</table>
-	</div>
-
-	<h3 style="text-align: center;">MOS Rating Standard</h3>
-	<div class="table-responsive pt-3">
-		<table class="table table-hover pt-2 rating-table">
-			<thead>
 			<tr>
-			<th>Score</th>
-			<th>Meaning</th>
+				<td>MOS</td>
+				<td class="rating-text">Mean Opinion Score: overall speech naturalness and audio quality.</td>
+				<td class="rating-text">Excellent: natural, clear, fluent, and free of obvious artifacts.</td>
+				<td class="rating-text">Good: mostly natural with minor artifacts or slight prosody issues.</td>
+				<td class="rating-text">Fair: understandable, but unnaturalness or artifacts are clearly noticeable.</td>
+				<td class="rating-text">Poor: frequent artifacts, unstable prosody, or tiring listening experience.</td>
+				<td class="rating-text">Bad: severely degraded, very unnatural, or difficult to understand.</td>
 			</tr>
-			</thead>
-			<tbody>
-			<tr><td>5</td><td class="rating-text">Excellent: natural, clear, and free of obvious artifacts.</td></tr>
-			<tr><td>4</td><td class="rating-text">Good: mostly natural with only minor artifacts.</td></tr>
-			<tr><td>3</td><td class="rating-text">Fair: understandable, but with noticeable naturalness or quality issues.</td></tr>
-			<tr><td>2</td><td class="rating-text">Poor: obvious artifacts or prosody problems that affect listening.</td></tr>
-			<tr><td>1</td><td class="rating-text">Bad: difficult to understand or severely degraded.</td></tr>
+			<tr>
+				<td>SS</td>
+				<td class="rating-text">Speaker Similarity: how similar the generated speaker identity is to the prompt audio.</td>
+				<td class="rating-text">Very similar: sounds like the same speaker with consistent timbre and style.</td>
+				<td class="rating-text">Similar: mostly same speaker, with small differences in timbre or speaking style.</td>
+				<td class="rating-text">Moderately similar: some speaker traits match, but mismatch is obvious.</td>
+				<td class="rating-text">Weakly similar: only a few traits match and it likely sounds like another speaker.</td>
+				<td class="rating-text">Not similar: speaker identity is not preserved.</td>
+			</tr>
+			<tr>
+				<td>FSC</td>
+				<td class="rating-text">F0 Sketch Correlation: how well the generated pitch contour follows the given F0 sketch.</td>
+				<td class="rating-text">Excellent match: pitch rises, falls, emphasis, and local shape closely follow the sketch.</td>
+				<td class="rating-text">Good match: main pitch trend follows the sketch with minor local deviations.</td>
+				<td class="rating-text">Partial match: broad trend is recognizable, but several segments deviate.</td>
+				<td class="rating-text">Weak match: only occasional pitch movements align with the sketch.</td>
+				<td class="rating-text">No match: pitch contour is unrelated to the sketch.</td>
+			</tr>
+			<tr>
+				<td>ESC</td>
+				<td class="rating-text">Energy Sketch Correlation: how well the generated energy contour follows the given energy sketch.</td>
+				<td class="rating-text">Excellent match: loudness, stress, and energy changes closely follow the sketch.</td>
+				<td class="rating-text">Good match: main energy trend follows the sketch with minor local deviations.</td>
+				<td class="rating-text">Partial match: broad energy pattern is recognizable, but several segments deviate.</td>
+				<td class="rating-text">Weak match: only occasional stress or energy changes align with the sketch.</td>
+				<td class="rating-text">No match: energy contour is unrelated to the sketch.</td>
+			</tr>
 			</tbody>
 		</table>
 	</div>
@@ -189,6 +232,8 @@
 
 <script>
 	const STORAGE_KEY = "sketchgct_audio_rating_scores_v1";
+	const RATE_STORAGE_KEY = "sketchgct_audio_rating_playback_rate_v1";
+	const PLAYBACK_RATES = ["0.75", "1", "1.25", "1.5", "1.75", "2"];
 	const ratingRows = [];
 
 	const paragraph1Samples = [
@@ -399,6 +444,9 @@
 	};
 
 	let scoreStore = loadScores();
+	let playbackRate = PLAYBACK_RATES.includes(localStorage.getItem(RATE_STORAGE_KEY))
+		? localStorage.getItem(RATE_STORAGE_KEY)
+		: "1";
 
 	const saveScores = () => {
 		const status = document.getElementById("save-status");
@@ -411,6 +459,23 @@
 	};
 
 	const rowKey = (section, sampleId, condition) => `${section}::${sampleId}::${condition}`;
+
+	const applyPlaybackRate = () => {
+		document.querySelectorAll("audio").forEach((audio) => {
+			audio.playbackRate = Number(playbackRate);
+		});
+	};
+
+	const setupPlaybackRate = () => {
+		const rateSelect = document.getElementById("playback-rate");
+		rateSelect.value = playbackRate;
+		applyPlaybackRate();
+		rateSelect.addEventListener("change", () => {
+			playbackRate = rateSelect.value;
+			localStorage.setItem(RATE_STORAGE_KEY, playbackRate);
+			applyPlaybackRate();
+		});
+	};
 
 	const selectControl = (key, metric) => {
 		const value = scoreStore[key] && scoreStore[key][metric] ? scoreStore[key][metric] : "";
@@ -625,6 +690,7 @@
 	document.addEventListener("DOMContentLoaded", () => {
 		renderConditionedRatings();
 		renderWithWithoutRatings();
+		setupPlaybackRate();
 		document.getElementById("export-csv").addEventListener("click", exportCsv);
 	});
 </script>
